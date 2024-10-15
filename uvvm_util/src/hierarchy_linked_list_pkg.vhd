@@ -541,9 +541,8 @@ package body hierarchy_linked_list_pkg is
           end if;
         end if;
 
-        if v_msg /= null then
-          deallocate(v_msg);
-        end if;
+        deallocate(v_msg);
+        deallocate(v_hierarchy);
 
         -- Write stop message if stop-limit is reached for number of this alert
         if (v_current_ptr.element_data.alert_stop_limit(alert_level) /= 0) and (v_current_ptr.element_data.alert_attention_counters(alert_level)(REGARD) >= v_current_ptr.element_data.alert_stop_limit(alert_level)) then
@@ -556,10 +555,6 @@ package body hierarchy_linked_list_pkg is
           else
             write(v_info, string'("*** To find the root cause of this alert, " & "step out the HDL calling stack in your simulator. ***" & LF & "*** For example, step out until you reach the call from the test sequencer. ***"));
           end if;
-        end if;
-
-        if v_hierarchy /= null then
-          deallocate(v_hierarchy);
         end if;
 
         -- 5. Write last part of alert message
@@ -575,11 +570,9 @@ package body hierarchy_linked_list_pkg is
           tee(OUTPUT, v_info);
           tee(ALERT_FILE, v_info);
           writeline(LOG_FILE, v_info);
-        else
-          if v_info /= null then
-            deallocate(v_info);
-          end if;
         end if;
+
+        deallocate(v_info);
 
         if (alert_level /= NO_ALERT) and (alert_level /= NOTE) and (alert_level /= TB_NOTE) and (alert_level /= MANUAL_CHECK) then
           update_uvvm_sim_status;
@@ -947,7 +940,8 @@ package body hierarchy_linked_list_pkg is
       write(v_line_copy, v_line.all & lf); -- copy line
       writeline(OUTPUT, v_line);
       writeline(LOG_FILE, v_line_copy);
-
+      deallocate(v_line);
+      deallocate(v_line_copy);
     end procedure;
 
     impure function get_parent_scope(

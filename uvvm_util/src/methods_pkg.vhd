@@ -3318,6 +3318,7 @@ package body methods_pkg is
       variable line_to_be_deallocated : inout line
     ) is
   begin
+    deprecate(get_procedure_name_from_instance_name(line_to_be_deallocated'instance_name), "deallocating a null-line shal have no effect according to the LRM. Just use deallocate()");
     if line_to_be_deallocated /= null then
       deallocate(line_to_be_deallocated);
     end if;
@@ -3533,7 +3534,7 @@ package body methods_pkg is
             write_to_file(log_file_name, open_mode, log_line);
           end if;
         when CONSOLE_ONLY =>
-          writeline(OUTPUT, log_line); -- Write to console and deallocate line
+          writeline(OUTPUT, log_line); -- Write to console and deallocate contents of line
         when LOG_ONLY =>
           if log_file_name = C_LOG_FILE_NAME then
             -- If the log file is the default file, it is not necessary to open and close it again
@@ -3606,13 +3607,13 @@ package body methods_pkg is
       write(v_msg_indent, to_string(C_MSG_ID_INDENT(msg_id)));
       v_msg_indent_width := v_msg_indent'length;
       write(v_info, v_msg_indent.all);
-      deallocate_line_if_exists(v_msg_indent);
+      deallocate(v_msg_indent);
 
       -- Then add the message it self (after replacing \n with LF
       if msg'length > 1 then
         write(v_info, to_string(replace_backslash_n_with_lf(v_msg.all)));
       end if;
-      deallocate_line_if_exists(v_msg);
+      deallocate(v_msg);
 
       if not C_SINGLE_LINE_LOG then
         -- Modify and align info-string if additional lines are required (after wrapping lines)
@@ -3640,7 +3641,7 @@ package body methods_pkg is
       end if;
 
       write(v_info_final, v_info.all); -- include actual info
-      deallocate_line_if_exists(v_info);
+      deallocate(v_info);
       -- Handle rest of potential log header
       if (msg_id = ID_LOG_HDR) then
         write(v_info_final, LF & fill_string('-',(C_LOG_LINE_WIDTH - C_LOG_PREFIX_WIDTH)));
@@ -3670,7 +3671,7 @@ package body methods_pkg is
               write_to_file(log_file_name, open_mode, v_info_final);
             end if;
           when CONSOLE_ONLY =>
-            writeline(OUTPUT, v_info_final); -- Write to console and deallocate line
+            writeline(OUTPUT, v_info_final); -- Write to console and deallocate contents of line
           when LOG_ONLY =>
             if log_file_name = C_LOG_FILE_NAME then
               -- If the log file is the default file, it is not necessary to open and close it again
@@ -3680,7 +3681,7 @@ package body methods_pkg is
               write_to_file(log_file_name, open_mode, v_info_final);
             end if;
         end case;
-        deallocate_line_if_exists(v_info_final);
+        deallocate(v_info_final);
       end if;
     end if;
   end procedure;
@@ -3992,6 +3993,7 @@ package body methods_pkg is
         if get_alert_attention(alert_level) = IGNORE then
           --       protected_alert_counters.increment(alert_level, IGNORE);
           increment_alert_counter(alert_level, IGNORE);
+          deallocate(v_msg);
         else
           --protected_alert_counters.increment(alert_level, REGARD);
           increment_alert_counter(alert_level, REGARD);
@@ -4012,7 +4014,7 @@ package body methods_pkg is
             replace(v_msg, LF, ' ');
             write(v_info, to_upper(to_string(alert_level)) & " #" & to_string(get_alert_counter(alert_level)) & "  ***" & justify(to_string(now, C_LOG_TIME_BASE), right, C_LOG_TIME_WIDTH) & "   " & to_string(scope) & "        " & v_msg.all);
           end if;
-          deallocate_line_if_exists(v_msg);
+          deallocate(v_msg);
 
           -- 4. Write stop message if stop-limit is reached for number of this alert
           if (get_alert_stop_limit(alert_level) /= 0) and (get_alert_counter(alert_level) >= get_alert_stop_limit(alert_level)) then
@@ -4035,7 +4037,7 @@ package body methods_pkg is
           tee(OUTPUT, v_info);
           tee(ALERT_FILE, v_info);
           writeline(LOG_FILE, v_info);
-          deallocate_line_if_exists(v_info);
+          deallocate(v_info);
 
           -- 6. Stop simulation if stop-limit is reached for number of this alert
           if (get_alert_stop_limit(alert_level) /= 0) then
@@ -9491,6 +9493,7 @@ package body methods_pkg is
         elsif print_alert_counters = REPORT_ALERT_COUNTERS_FINAL then
           report_alert_counters(FINAL);
         end if;
+        deallocate(v_line);
         return true;
       end if;
     else

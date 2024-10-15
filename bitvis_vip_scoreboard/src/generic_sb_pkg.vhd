@@ -1640,7 +1640,6 @@ package body generic_sb_pkg is
       constant ext_proc_call : in string := ""
     ) is
       variable v_line                           : line;
-      variable v_line_copy                      : line;
       variable v_status_failed                  : boolean  := true;
       variable v_mismatch                       : boolean  := false;
       variable v_no_enabled_instances           : boolean  := true;
@@ -1729,9 +1728,9 @@ package body generic_sb_pkg is
       prefix_lines(v_line, prefix);
 
       -- Write the info string to transcript
-      write(v_line_copy, v_line.all);   -- copy line
-      writeline(OUTPUT, v_line);
-      writeline(LOG_FILE, v_line_copy);
+      tee(OUTPUT, v_line);
+      writeline(LOG_FILE, v_line);
+      deallocate(v_line);
     end procedure report_counters;
 
     procedure report_counters(

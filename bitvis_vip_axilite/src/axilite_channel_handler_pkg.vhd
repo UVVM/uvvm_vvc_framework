@@ -429,6 +429,7 @@ package body axilite_channel_handler_pkg is
     else
     -- Log will be handled by calling procedure (e.g. read_data_channel_check)
     end if;
+    deallocate(v_proc_call);
   end procedure read_data_channel_receive;
 
   procedure read_data_channel_check(

@@ -282,9 +282,10 @@ package body spec_cov_pkg is
       -- Log result to transcript
       log(ID_SPEC_COV, "Logging requirement " & requirement & " [" & priv_test_status_to_string(v_requirement_status) & "]. '" & priv_get_description(requirement) & "'. " & msg, scope);
       -- Log to file
-      write(v_requirement_to_file_line, requirement & C_CSV_DELIMITER & priv_get_default_testcase_name & C_CSV_DELIMITER & priv_test_status_to_string(v_requirement_status));
       if priv_result_file_exists then
+        write(v_requirement_to_file_line, requirement & C_CSV_DELIMITER & priv_get_default_testcase_name & C_CSV_DELIMITER & priv_test_status_to_string(v_requirement_status));
         writeline(RESULT_FILE, v_requirement_to_file_line);
+        deallocate(v_requirement_to_file_line);
       end if;
       -- Increment number of tick off for this requirement
       priv_inc_num_requirement_tick_offs(requirement);
@@ -386,13 +387,12 @@ package body spec_cov_pkg is
     priv_requirements_in_array := 0;
 
     -- Add closing line
-    write(v_checksum_string, priv_get_summary_string);
-
     if priv_result_file_exists then
+      write(v_checksum_string, priv_get_summary_string);
       writeline(RESULT_FILE, v_checksum_string);
+      deallocate(v_checksum_string);
+      file_close(RESULT_FILE);
     end if;
-
-    file_close(RESULT_FILE);
 
     -- Clear initialization flag. initialize_req_cov() must be called again before another tickoff can be done
     priv_req_cov_initialized := false;
@@ -427,6 +427,7 @@ package body spec_cov_pkg is
     write(v_settings_to_file_line, "TESTCASE_NAME: " & priv_get_default_testcase_name & LF);
     write(v_settings_to_file_line, "DELIMITER: " & shared_spec_cov_config.csv_delimiter & LF);
     writeline(RESULT_FILE, v_settings_to_file_line);
+    deallocate(v_settings_to_file_line);
   end procedure priv_initialize_result_file;
 
   --
@@ -506,11 +507,11 @@ package body spec_cov_pkg is
           write(v_line, priv_requirement_array(index).tc_list(i).all);
         end loop;
         log(ID_SPEC_COV_REQS, v_line.all, C_SCOPE);
+        deallocate(v_line);
       end if;
     else
       log(ID_SPEC_COV_REQS, "Requirement entry was not valid", C_SCOPE);
     end if;
-    deallocate(v_line);
   end procedure priv_log_entry;
 
   --
