@@ -737,6 +737,7 @@ package body string_methods_pkg is
       write(v_msg_line, string'(" "));
     end if;
     bitvis_assert(v_line'length > 0, ERROR, "No process name found", "get_process_name_from_instance_name()");
+    deallocate(v_msg_line);
     return return_and_deallocate;
   end;
 
@@ -764,6 +765,7 @@ package body string_methods_pkg is
       write(v_msg_line, string'(" "));
     end if;
     bitvis_assert(v_line'length > 0, ERROR, "No entity name found", "get_entity_name_from_instance_name()");
+    deallocate(v_msg_line);
     return return_and_deallocate;
   end;
 

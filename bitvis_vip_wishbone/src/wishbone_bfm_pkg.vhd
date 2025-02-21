@@ -325,6 +325,8 @@ package body wishbone_bfm_pkg is
     else
     -- Log will be handled by calling procedure (e.g. wishbone_check)
     end if;
+
+    deallocate(v_proc_call);
   end procedure wishbone_read;
 
   procedure wishbone_check(

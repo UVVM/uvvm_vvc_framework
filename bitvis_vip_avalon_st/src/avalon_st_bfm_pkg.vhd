@@ -385,6 +385,7 @@ package body avalon_st_bfm_pkg is
     else
       log(ID_PACKET_COMPLETE, proc_call & " DONE. " & add_msg_delimiter(msg), scope, msg_id_panel);
     end if;
+    deallocate(v_symbol_array);
   end procedure;
 
   ---------------------------------------------------------------------------------------------
@@ -613,6 +614,7 @@ package body avalon_st_bfm_pkg is
     end if;
 
     DEALLOCATE(v_proc_call);
+    deallocate(v_symbol_array);
   end procedure;
 
   ---------------------------------------------------------------------------------------------

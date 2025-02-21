@@ -2385,6 +2385,7 @@ package body rand_pkg is
       if min_value > max_value then
         alert(TB_ERROR, v_proc_call.all & "=> min_value must be less than max_value", priv_scope);
         priv_ret_valid := false;
+        deallocate(v_proc_call);
         return v_ret;
       end if;
       if cyclic_mode = CYCLIC and priv_rand_dist = GAUSSIAN then
@@ -2460,6 +2461,7 @@ package body rand_pkg is
         when others =>
           alert(TB_ERROR, v_proc_call.all & "=> Randomization distribution not supported: " & to_upper(to_string(priv_rand_dist)), priv_scope);
           priv_ret_valid := false;
+          deallocate(v_proc_call);
           return v_ret;
       end case;
 
@@ -2489,6 +2491,7 @@ package body rand_pkg is
       if specifier /= ONLY then
         alert(TB_ERROR, v_proc_call.all & "=> Invalid parameter: " & to_upper(to_string(specifier)), priv_scope);
         priv_ret_valid := false;
+        deallocate(v_proc_call);
         return v_ret;
       end if;
       if priv_rand_dist = GAUSSIAN then
@@ -2721,6 +2724,7 @@ package body rand_pkg is
       if min_value > max_value then
         alert(TB_ERROR, v_proc_call.all & "=> min_value must be less than max_value", priv_scope);
         priv_ret_valid := false;
+        deallocate(v_proc_call);
         return v_ret;
       end if;
 
@@ -2736,6 +2740,7 @@ package body rand_pkg is
         when others =>
           alert(TB_ERROR, v_proc_call.all & "=> Randomization distribution not supported: " & to_upper(to_string(priv_rand_dist)), priv_scope);
           priv_ret_valid := false;
+          deallocate(v_proc_call);
           return v_ret;
       end case;
 
@@ -2761,6 +2766,7 @@ package body rand_pkg is
       if specifier /= ONLY then
         alert(TB_ERROR, v_proc_call.all & "=> Invalid parameter: " & to_upper(to_string(specifier)), priv_scope);
         priv_ret_valid := false;
+        deallocate(v_proc_call);
         return real'left;
       end if;
       if priv_rand_dist = GAUSSIAN then
@@ -2978,6 +2984,7 @@ package body rand_pkg is
       if min_value > max_value then
         alert(TB_ERROR, v_proc_call.all & "=> min_value must be less than max_value", priv_scope);
         priv_ret_valid := false;
+        deallocate(v_proc_call);
         return v_ret;
       end if;
 
@@ -2988,10 +2995,12 @@ package body rand_pkg is
         when GAUSSIAN =>
           alert(TB_ERROR, v_proc_call.all & "=> Randomization distribution not supported: " & to_upper(to_string(priv_rand_dist)), priv_scope);
           priv_ret_valid := false;
+          deallocate(v_proc_call);
           return v_ret;
         when others =>
           alert(TB_ERROR, v_proc_call.all & "=> Randomization distribution not supported: " & to_upper(to_string(priv_rand_dist)), priv_scope);
           priv_ret_valid := false;
+          deallocate(v_proc_call);
           return v_ret;
       end case;
 
@@ -3016,6 +3025,7 @@ package body rand_pkg is
       if specifier /= ONLY then
         alert(TB_ERROR, v_proc_call.all & "=> Invalid parameter: " & to_upper(to_string(specifier)), priv_scope);
         priv_ret_valid := false;
+        deallocate(v_proc_call);
         return time'left;
       end if;
 
@@ -3992,10 +4002,12 @@ package body rand_pkg is
 
       if min_value >= max_value then
         alert(TB_ERROR, v_proc_call.all & "=> min_value must be less than max_value", priv_scope);
+        deallocate(v_proc_call);
         return v_ret;
       end if;
       if min_value'length > length or max_value'length > length then
         alert(TB_ERROR, v_proc_call.all & "=> unsigned min_value and max_value lengths must be less or equal than length", priv_scope);
+        deallocate(v_proc_call);
         return v_ret;
       end if;
       if priv_rand_dist = GAUSSIAN then
@@ -4062,6 +4074,7 @@ package body rand_pkg is
       create_proc_call(C_LOCAL_CALL, ext_proc_call, v_proc_call);
 
       if not check_parameters_within_range(length, integer_vector(set_of_values), C_LOCAL_CALL, signed_values => false) then
+        deallocate(v_proc_call);
         return v_ret;
       end if;
       -- Generate a random value within the set of values
@@ -4277,10 +4290,12 @@ package body rand_pkg is
 
       if min_value >= max_value then
         alert(TB_ERROR, v_proc_call.all & "=> min_value must be less than max_value", priv_scope);
+        deallocate(v_proc_call);
         return v_ret;
       end if;
       if min_value'length > length or max_value'length > length then
         alert(TB_ERROR, v_proc_call.all & "=> signed min_value and max_value lengths must be less or equal than length", priv_scope);
+        deallocate(v_proc_call);
         return v_ret;
       end if;
       if priv_rand_dist = GAUSSIAN then
@@ -4343,6 +4358,7 @@ package body rand_pkg is
       create_proc_call(C_LOCAL_CALL, ext_proc_call, v_proc_call);
 
       if not check_parameters_within_range(length, set_of_values, v_proc_call.all, signed_values => true) then
+        deallocate(v_proc_call);
         return v_ret;
       end if;
       -- Generate a random value within the set of values
@@ -4871,6 +4887,7 @@ package body rand_pkg is
       for i in weighted_vector'range loop
         if weighted_vector(i).min_value > weighted_vector(i).max_value then
           alert(TB_ERROR, v_proc_call.all & "=> The min_value parameter must be less or equal than max_value", priv_scope);
+          deallocate(v_proc_call);
           return v_ret;
         end if;
         v_mode := weighted_vector(i).mode when weighted_vector(i).mode /= NA else COMBINED_WEIGHT;
@@ -4880,12 +4897,14 @@ package body rand_pkg is
         -- Use the same weight for each value in the range -> Not possible to know every value within the range
         elsif v_mode = INDIVIDUAL_WEIGHT then
           alert(TB_ERROR, v_proc_call.all & "=> INDIVIDUAL_WEIGHT not supported for real type", priv_scope);
+          deallocate(v_proc_call);
           return v_ret;
         end if;
         v_acc_weighted_vector(i) := v_acc_weight;
       end loop;
       if v_acc_weight = 0 then
         alert(TB_ERROR, v_proc_call.all & "=> The total weight of the values must be greater than 0", priv_scope);
+        deallocate(v_proc_call);
         return v_ret;
       end if;
 
@@ -4982,6 +5001,7 @@ package body rand_pkg is
       for i in weighted_vector'range loop
         if weighted_vector(i).min_value > weighted_vector(i).max_value then
           alert(TB_ERROR, v_proc_call.all & "=> The min_value parameter must be less or equal than max_value", priv_scope);
+          deallocate(v_proc_call);
           return v_ret;
         end if;
         v_mode := weighted_vector(i).mode when weighted_vector(i).mode /= NA else COMBINED_WEIGHT;
@@ -4991,12 +5011,14 @@ package body rand_pkg is
         -- Use the same weight for each value in the range -> Not possible to know every value within the range
         elsif v_mode = INDIVIDUAL_WEIGHT then
           alert(TB_ERROR, v_proc_call.all & "=> INDIVIDUAL_WEIGHT not supported for time type", priv_scope);
+          deallocate(v_proc_call);
           return v_ret;
         end if;
         v_acc_weighted_vector(i) := v_acc_weight;
       end loop;
       if v_acc_weight = 0 then
         alert(TB_ERROR, v_proc_call.all & "=> The total weight of the values must be greater than 0", priv_scope);
+        deallocate(v_proc_call);
         return v_ret;
       end if;
 
@@ -6405,6 +6427,7 @@ package body rand_pkg is
 
       -- Check only integer constraints are configured
       if not (check_configured_constraints("INTEGER", v_proc_call.all, is_config => false)) then
+        deallocate(v_proc_call);
         return v_ret;
       end if;
 
@@ -6420,6 +6443,7 @@ package body rand_pkg is
                     priv_scope, ID_NEVER, caller_name => C_LOCAL_CALL_2);
         v_ret := rand_range_weight_mode(priv_int_constraints.weighted.all, msg_id_panel, C_LOCAL_CALL_2);
         log(ID_RAND_GEN, C_LOCAL_CALL_2 & "=> " & to_string(v_ret), priv_scope, msg_id_panel);
+        deallocate(v_proc_call);
         return v_ret;
       end if;
 
@@ -6492,6 +6516,7 @@ package body rand_pkg is
         when others =>
           alert(TB_ERROR, v_proc_call.all & "=> Unexpected constraints: " & to_string(unsigned'(v_ran_incl_configured & v_val_incl_configured & v_val_excl_configured)), priv_scope);
           priv_ret_valid := false;
+          deallocate(v_proc_call);
           return v_ret;
       end case;
 
@@ -6527,6 +6552,7 @@ package body rand_pkg is
 
       -- Check only real constraints are configured
       if not (check_configured_constraints("REAL", v_proc_call.all, is_config => false)) then
+        deallocate(v_proc_call);
         return v_ret;
       end if;
       if priv_cyclic_mode = CYCLIC then
@@ -6543,6 +6569,7 @@ package body rand_pkg is
                     priv_scope, ID_NEVER, caller_name => C_LOCAL_CALL_2);
         v_ret := rand_range_weight_mode(priv_real_constraints.weighted.all, msg_id_panel, C_LOCAL_CALL_2);
         log(ID_RAND_GEN, C_LOCAL_CALL_2 & "=> " & to_string(v_ret), priv_scope, msg_id_panel);
+        deallocate(v_proc_call);
         return v_ret;
       end if;
 
@@ -6572,6 +6599,7 @@ package body rand_pkg is
         when "001" =>
           alert(TB_ERROR, v_proc_call.all & "=> Real random generator needs ""include"" constraints", priv_scope);
           priv_ret_valid := false;
+          deallocate(v_proc_call);
           return v_ret;
         ----------------------------------------
         -- RANGE + SET OF VALUES
@@ -6614,11 +6642,13 @@ package body rand_pkg is
         when "000" =>
           alert(TB_ERROR, v_proc_call.all & "=> Real random generator must be constrained", priv_scope);
           priv_ret_valid := false;
+          deallocate(v_proc_call);
           return v_ret;
 
         when others =>
           alert(TB_ERROR, v_proc_call.all & "=> Unexpected constraints: " & to_string(unsigned'(v_ran_incl_configured & v_val_incl_configured & v_val_excl_configured)), priv_scope);
           priv_ret_valid := false;
+          deallocate(v_proc_call);
           return v_ret;
       end case;
 
@@ -6654,10 +6684,12 @@ package body rand_pkg is
 
       -- Check only time constraints are configured
       if not (check_configured_constraints("TIME", v_proc_call.all, is_config => false)) then
+        deallocate(v_proc_call);
         return v_ret;
       end if;
       if priv_rand_dist = GAUSSIAN then
         alert(TB_ERROR, v_proc_call.all & "=> " & to_upper(to_string(priv_rand_dist)) & " distribution not supported for time type.", priv_scope);
+        deallocate(v_proc_call);
         return v_ret;
       end if;
       if priv_cyclic_mode = CYCLIC then
@@ -6674,6 +6706,7 @@ package body rand_pkg is
                     priv_scope, ID_NEVER, caller_name => C_LOCAL_CALL_2);
         v_ret := rand_range_weight_mode(priv_time_constraints.weighted.all, msg_id_panel, C_LOCAL_CALL_2);
         log(ID_RAND_GEN, C_LOCAL_CALL_2 & "=> " & to_string(v_ret), priv_scope, msg_id_panel);
+        deallocate(v_proc_call);
         return v_ret;
       end if;
 
@@ -6703,6 +6736,7 @@ package body rand_pkg is
         when "001" =>
           alert(TB_ERROR, v_proc_call.all & "=> Time random generator needs ""include"" constraints", priv_scope);
           priv_ret_valid := false;
+          deallocate(v_proc_call);
           return v_ret;
         ----------------------------------------
         -- RANGE + SET OF VALUES
@@ -6745,11 +6779,13 @@ package body rand_pkg is
         when "000" =>
           alert(TB_ERROR, v_proc_call.all & "=> Time random generator must be constrained", priv_scope);
           priv_ret_valid := false;
+          deallocate(v_proc_call);
           return v_ret;
 
         when others =>
           alert(TB_ERROR, v_proc_call.all & "=> Unexpected constraints: " & to_string(unsigned'(v_ran_incl_configured & v_val_incl_configured & v_val_excl_configured)), priv_scope);
           priv_ret_valid := false;
+          deallocate(v_proc_call);
           return v_ret;
       end case;
 

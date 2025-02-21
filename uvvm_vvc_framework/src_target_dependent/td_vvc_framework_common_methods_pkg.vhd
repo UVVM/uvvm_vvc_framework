@@ -542,6 +542,7 @@ package body td_vvc_framework_common_methods_pkg is
       --shared_vvc_cmd.parent_msg_id_panel  := parent_msg_id_panel; --UVVM: temporary fix for HVVC, uncomment in v3.0
       send_command_to_vvc(vvc_target, timeout, scope, v_msg_id_panel);
     end if;
+    deallocate(v_proc_call);
   end procedure;
 
   procedure await_completion(
@@ -659,6 +660,7 @@ package body td_vvc_framework_common_methods_pkg is
       shared_vvc_cmd.gen_boolean := false;
     end if;
     send_command_to_vvc(vvc_target, timeout, scope, v_msg_id_panel);
+    deallocate(v_proc_call);
   end procedure;
 
   procedure await_any_completion(

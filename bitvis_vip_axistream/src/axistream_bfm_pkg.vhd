@@ -1914,6 +1914,7 @@ package body axistream_bfm_pkg is
       alert(alert_level, v_all_alerts_line.all, scope);
     end if;
 
+    deallocate(v_all_alerts_line);
   end procedure axistream_expect;
 
   -- t_byte_array overload

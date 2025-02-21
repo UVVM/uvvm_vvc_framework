@@ -971,6 +971,7 @@ package body ti_vvc_framework_support_pkg is
     elsif list_action = KEEP_LIST then
       log(ID_AWAIT_COMPLETION_LIST, v_proc_call.all & "=> Keeping all VVCs in the list. " & add_msg_delimiter(msg) & format_command_idx(v_local_cmd_idx), scope, msg_id_panel);
     end if;
+    deallocate(v_proc_call);
   end procedure;
 
   procedure await_completion(
