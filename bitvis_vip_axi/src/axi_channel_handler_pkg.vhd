@@ -560,6 +560,7 @@ package body axi_channel_handler_pkg is
     variable v_rlast_detected       : boolean := false;
     variable v_returning_rid        : std_logic_vector(rid'length - 1 downto 0);
     variable v_read_data            : t_vvc_result;
+    variable v_ret                  : boolean := true;
   begin
 
     if ext_proc_call = "" then
@@ -603,7 +604,10 @@ package body axi_channel_handler_pkg is
           exit;
         end if;
       end loop;
-      check_value(not v_await_rvalid, config.max_wait_cycles_severity, ": Timeout waiting for RVALID", scope, ID_NEVER, msg_id_panel, v_proc_call.all);
+      v_ret := check_value(not v_await_rvalid, config.max_wait_cycles_severity, ": Timeout waiting for RVALID", scope, ID_NEVER, msg_id_panel, v_proc_call.all);
+      if (v_ret = false) then
+        exit;
+      end if;
       if v_rlast_detected then
         read_result := read_data_queue.fetch_from_queue(v_returning_rid);
         exit;
